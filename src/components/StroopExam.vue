@@ -14,12 +14,25 @@ interface GuessResult {
   visual: Color
   lexical: Color
   guess: Color
+  durationMs: number
+  correct: boolean
+  congruent: boolean
 }
 
 const hex = computed(() => colors[visualColor.value].hex)
 const name = computed(() => colors[lexicalColor.value].names[lang.value])
 
 const guesses: Ref<GuessResult[]> = ref([])
+
+let startClock = performance.now()
+
+function elapsed(): number {
+  return Math.round(performance.now() - startClock)
+}
+
+function resetTimer() {
+  startClock = performance.now()
+}
 
 function random(min: number, max: number): number {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -42,6 +55,7 @@ function next() {
   const congruent = random(0, 1) === 1
   visualColor.value = randomColor()
   lexicalColor.value = congruent ? visualColor.value : randomColor()
+  resetTimer()
 }
 
 const langOptions = ref(chosenLangs.map((choice) => ({
@@ -54,7 +68,10 @@ function guess(color: Color) {
     index: guesses.value.length,
     visual: visualColor.value,
     lexical: lexicalColor.value,
-    guess: color
+    guess: color,
+    durationMs: elapsed(),
+    correct: visualColor.value === color,
+    congruent: visualColor.value === lexicalColor.value,
   })
   next()
 }
@@ -87,11 +104,17 @@ function guess(color: Color) {
         <th>Visual Color</th>
         <th>Written Color</th>
         <th>Guess</th>
+        <th>Duration</th>
+        <th>Correct</th>
+        <th>Congruent</th>
       </tr>
       <tr v-for="guess in guesses" :key="guess.index">
         <td>{{ guess.visual }}</td>
         <td>{{ guess.lexical }}</td>
         <td>{{ guess.guess }}</td>
+        <td>{{ guess.durationMs }} milliseconds</td>
+        <td>{{ guess.correct }}</td>
+        <td>{{ guess.congruent }}</td>
       </tr>
     </table>
   </div>
