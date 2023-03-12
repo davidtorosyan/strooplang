@@ -1,30 +1,11 @@
-export type Color = 'red' | 'blue' | 'green' | 'brown' | 'purple'
-export type Lang = 'en' | 'ru'
+import type { Color, ColorInfo, Lang, LangInfo } from "./types"
 
-export const chosenColors: readonly Color[] = [
-  'red',
-  'blue',
-  'green',
-  'brown',
-  'purple',
-]
-
-export const chosenLangs: readonly Lang[] = [
-  'en',
-  'ru',
-]
-
-export interface ColorInfo {
-  hex: string
-  names: Record<Lang, string>
+export const langRecords: Record<Lang, LangInfo> = {
+  'en': { name: 'English' },
+  'ru': { name: 'Russian' },
 }
 
-export const languages: Record<Lang, string> = {
-  'en': 'English',
-  'ru': 'Russian',
-}
-
-export const colors: Record<Color, ColorInfo> = {
+export const colorRecords: Record<Color, ColorInfo> = {
   'red': {
     hex: '#d12626',
     names: {

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { Ref } from 'vue'
+import type { Color } from '@/data/types';
+import { colorRecords } from '@/data/colors';
+import { colorSet } from '@/data/sets';
+import { useExamSettingsStore } from '@/stores/examSettings'
 
-import { colors, languages, chosenColors, chosenLangs } from './colors'
-import type { Color, Lang } from './colors'
+const examSettings = useExamSettingsStore()
 
-const lang: Ref<Lang> = ref('en')
 const visualColor: Ref<Color> = ref('red')
 const lexicalColor: Ref<Color> = ref('red')
 
@@ -19,8 +21,8 @@ interface GuessResult {
   congruent: boolean
 }
 
-const hex = computed(() => colors[visualColor.value].hex)
-const name = computed(() => colors[lexicalColor.value].names[lang.value])
+const hex = computed(() => colorRecords[visualColor.value].hex)
+const name = computed(() => colorRecords[lexicalColor.value].names[examSettings.lang])
 
 const guesses: Ref<GuessResult[]> = ref([])
 
@@ -41,14 +43,14 @@ function random(min: number, max: number): number {
 function randomColor(except?: Color): Color {
   let index
   if (except) {
-    const exceptIndex = chosenColors.indexOf(except)
-    const randIndex = random(0, chosenColors.length - 2)
+    const exceptIndex = colorSet.indexOf(except)
+    const randIndex = random(0, colorSet.length - 2)
     index = randIndex + (randIndex >= exceptIndex ? 1 : 0)
 
   } else {
-    index = random(0, chosenColors.length - 1)
+    index = random(0, colorSet.length - 1)
   }
-  return chosenColors[index]
+  return colorSet[index]
 }
 
 function next() {
@@ -57,11 +59,6 @@ function next() {
   lexicalColor.value = congruent ? visualColor.value : randomColor()
   resetTimer()
 }
-
-const langOptions = ref(chosenLangs.map((choice) => ({
-  text: languages[choice],
-  value: choice
-})))
 
 function guess(color: Color) {
   guesses.value.push({
@@ -79,21 +76,17 @@ function guess(color: Color) {
 </script>
 
 <template>
+  <h3>
+    Exam
+  </h3>
   <div class="stage">
     <span class="word">{{ name }}</span>
   </div>
   <div>
     <button @click="next">next</button>
   </div>
-  <div>
-    <select v-model="lang">
-      <option v-for="option in langOptions" :value="option.value" :key="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-  </div>
   <div class="controls">
-    <button @click="guess(choice)" :style="`background-color: ${colors[choice].hex};`" v-for="choice in chosenColors"
+    <button @click="guess(choice)" :style="`background-color: ${colorRecords[choice].hex};`" v-for="choice in colorSet"
       :key="choice">
       {{ choice }}
     </button>
