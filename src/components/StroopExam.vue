@@ -1,63 +1,29 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
-import type { Color } from '@/data/types';
+import { ref, computed, type Ref } from 'vue'
+import type { Color, GuessResult } from '@/data/types';
 import { colorRecords } from '@/data/colors';
 import { colorSet } from '@/data/sets';
 import { useExamSettingsStore } from '@/stores/examSettings'
+import { random, randomColor } from '@/utils/rand';
+import { Timer } from '@/utils/timer';
 
 const examSettings = useExamSettingsStore()
 
 const visualColor: Ref<Color> = ref('red')
 const lexicalColor: Ref<Color> = ref('red')
 
-interface GuessResult {
-  index: number
-  visual: Color
-  lexical: Color
-  guess: Color
-  durationMs: number
-  correct: boolean
-  congruent: boolean
-}
-
 const hex = computed(() => colorRecords[visualColor.value].hex)
 const name = computed(() => colorRecords[lexicalColor.value].names[examSettings.lang])
 
 const guesses: Ref<GuessResult[]> = ref([])
 
-let startClock = performance.now()
-
-function elapsed(): number {
-  return Math.round(performance.now() - startClock)
-}
-
-function resetTimer() {
-  startClock = performance.now()
-}
-
-function random(min: number, max: number): number {
-  return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-function randomColor(except?: Color): Color {
-  let index
-  if (except) {
-    const exceptIndex = colorSet.indexOf(except)
-    const randIndex = random(0, colorSet.length - 2)
-    index = randIndex + (randIndex >= exceptIndex ? 1 : 0)
-
-  } else {
-    index = random(0, colorSet.length - 1)
-  }
-  return colorSet[index]
-}
+const timer = new Timer()
 
 function next() {
   const congruent = random(0, 1) === 1
   visualColor.value = randomColor()
   lexicalColor.value = congruent ? visualColor.value : randomColor()
-  resetTimer()
+  timer.reset()
 }
 
 function guess(color: Color) {
@@ -66,7 +32,7 @@ function guess(color: Color) {
     visual: visualColor.value,
     lexical: lexicalColor.value,
     guess: color,
-    durationMs: elapsed(),
+    durationMs: timer.elapsedMs(),
     correct: visualColor.value === color,
     congruent: visualColor.value === lexicalColor.value,
   })

@@ -10,3 +10,13 @@ export interface ColorInfo {
 export interface LangInfo {
   name: string
 }
+
+export interface GuessResult {
+  index: number
+  visual: Color
+  lexical: Color
+  guess: Color
+  durationMs: number
+  correct: boolean
+  congruent: boolean
+}
