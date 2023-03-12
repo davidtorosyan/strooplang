@@ -67,18 +67,33 @@ const colors: Record<Color, ColorInfo> = {
 }
 
 const lang: Ref<Lang> = ref('en')
-const color: Ref<Color> = ref('red')
+const visualColor: Ref<Color> = ref('red')
+const lexicalColor: Ref<Color> = ref('red')
 
-const hex = computed(() => colors[color.value].hex)
-const name = computed(() => colors[color.value].names[lang.value])
+const hex = computed(() => colors[visualColor.value].hex)
+const name = computed(() => colors[lexicalColor.value].names[lang.value])
 
-function random(min: number, max: number) {
+function random(min: number, max: number): number {
   return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+function randomColor(except?: Color): Color {
+  let index
+  if (except) {
+    const exceptIndex = chosenColors.indexOf(except)
+    const randIndex = random(0, chosenColors.length - 2)
+    index = randIndex + (randIndex >= exceptIndex ? 1 : 0)
+
+  } else {
+    index = random(0, chosenColors.length - 1)
+  }
+  return chosenColors[index]
+}
+
 function next() {
-  const index = random(0, chosenColors.length - 1)
-  color.value = chosenColors[index]
+  const congruent = random(0, 1) === 1
+  visualColor.value = randomColor()
+  lexicalColor.value = congruent ? visualColor.value : randomColor()
 }
 
 const langOptions = ref(chosenLangs.map((choice) => ({
@@ -89,7 +104,7 @@ const langOptions = ref(chosenLangs.map((choice) => ({
 </script>
 
 <template>
-  <div>
+  <div class="stage">
     <span class="word">{{ name }}</span>
   </div>
   <div>
@@ -106,6 +121,18 @@ const langOptions = ref(chosenLangs.map((choice) => ({
 
 <style scoped>
 .word {
+  font-weight: 500;
+  font-size: 3rem;
   color: v-bind('hex')
+}
+
+.stage {
+  border-color: black;
+  border-width: 5px;
+  border-style: solid;
+  text-align: center;
+  background-color: beige;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 </style>
