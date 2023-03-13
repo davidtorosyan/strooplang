@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { colorRecords } from '@/data/colors';
-import { colorSet } from '@/data/sets';
 import { useExamSettingsStore } from '@/stores/examSettings'
 import { useExamStateStore } from '@/stores/examState';
 import ColorButtons from './ColorButtons.vue'
