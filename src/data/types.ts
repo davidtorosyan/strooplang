@@ -27,7 +27,7 @@ export interface StimulusResponse {
 
 export interface TestResult {
   index: number
-  date: Date
+  dateMs: number
   responses: StimulusResponse[]
   lang: Lang
 }

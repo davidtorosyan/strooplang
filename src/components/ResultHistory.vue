@@ -13,7 +13,8 @@ const examResults: ComputedRef<TestResultInfo[]> = computed(() => examHistory.re
   stats: computeStats(r),
 })))
 
-function formatDate(date: Date): string {
+function formatDate(dateMs: number): string {
+  const date = new Date(dateMs)
   return date.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" })
 }
 
@@ -32,7 +33,7 @@ function formatDate(date: Date): string {
         <th>Interference</th>
       </tr>
       <tr v-for="result in examResults" :key="result.index">
-        <td>{{ formatDate(result.date) }}</td>
+        <td>{{ formatDate(result.dateMs) }}</td>
         <td>{{ langRecords[result.lang].name }}</td>
         <td v-if="result.stats">{{ result.stats.congruentMeanDurationMs }} ms</td>
         <td v-if="result.stats">{{ (result.stats.deltaPercent * 100).toFixed(0) }}%</td>

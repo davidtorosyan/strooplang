@@ -9,11 +9,13 @@ export const useExamHistoryStore = defineStore('examHistory', () => {
   function publish(responses: StimulusResponse[], lang: Lang) {
     results.value.push({
       index: index.value++,
-      date: new Date(),
+      dateMs: Date.now(),
       responses,
       lang,
     })
   }
 
   return { results, publish }
-})
+},{
+  persist: true,
+},)
