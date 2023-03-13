@@ -44,4 +44,15 @@ td {
   width: 100%;
   height: 50px;
 }
+
+* {
+  touch-action: none;
+  pointer-events: none;
+}
+
+input,
+button,
+a {
+  pointer-events: auto;
+}
 </style>
