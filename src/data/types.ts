@@ -34,7 +34,7 @@ export interface TestResult {
 
 export interface TestStats {
   responseCount: number
-  correctCount: number
+  validCount: number
   congruentMeanDurationMs: number
   incongruentMeanDurationMs: number
   deltaMs: number

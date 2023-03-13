@@ -1,12 +1,21 @@
 import type { Stimulus } from "@/data/types";
 import { random, randomColor } from "./rand";
 
-const examLength = 5
+const examLength = 20
 
-function createStimulus(): Stimulus {
-  const congruent = random(0, 1) === 1
+function shuffle<T>(array: T[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = random(0, i);
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+
+function createStimulus(congruent: boolean): Stimulus {
   const visual = randomColor()
-  const lexical = congruent ? visual : randomColor()
+  const lexical = congruent ? visual : randomColor(visual)
   return {
     visual,
     lexical,
@@ -14,6 +23,12 @@ function createStimulus(): Stimulus {
   }
 }
 
+function range(max: number): number[] {
+  return Array.from({ length: max }, (_, i) => i)
+}
+
 export function createStimuli(): Stimulus[] {
-  return Array.from({ length: examLength }, createStimulus);
+  const result = range(examLength).map(i => createStimulus(i % 2 === 0))
+  shuffle(result)
+  return result
 }

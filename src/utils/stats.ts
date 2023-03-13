@@ -1,6 +1,8 @@
 import type { TestResult, TestStats } from "@/data/types";
 
 const minResponseCount = 1
+const minDurationMs = 200
+const maxDurationMs = 5000
 
 function mean(arr: number[]) {
   return Math.round(arr.reduce((a, b) => a + b) / arr.length);
@@ -12,9 +14,10 @@ function toPercent(value: number) {
 
 export function computeStats(result: TestResult) : TestStats | undefined {
   const correct = result.responses.filter(r => r.correct)
+  const valid = correct.filter(r => r.durationMs > minDurationMs && r.durationMs < maxDurationMs)
 
-  const congruent = correct.filter(r => r.stimulus.congruent)
-  const incongruent = correct.filter(r => !r.stimulus.congruent)
+  const congruent = valid.filter(r => r.stimulus.congruent)
+  const incongruent = valid.filter(r => !r.stimulus.congruent)
 
   if (congruent.length < minResponseCount || incongruent.length < minResponseCount) {
     return undefined
@@ -28,7 +31,7 @@ export function computeStats(result: TestResult) : TestStats | undefined {
 
   return {
     responseCount: result.responses.length,
-    correctCount: correct.length,
+    validCount: valid.length,
     congruentMeanDurationMs,
     incongruentMeanDurationMs,
     deltaMs,
