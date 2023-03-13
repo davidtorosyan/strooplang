@@ -36,10 +36,13 @@ const name = computed(() => examState.running ? colorRecords[stimulus.value.lexi
 .word {
   font-weight: 500;
   font-size: 3rem;
-  color: v-bind('hex')
+  color: v-bind('hex');
 }
 
 .stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-color: black;
   border-width: 5px;
   border-style: solid;
