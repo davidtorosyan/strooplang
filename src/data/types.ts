@@ -1,6 +1,6 @@
 export type Color = 'red' | 'blue' | 'green' | 'brown' | 'purple'
 
-export type Lang = 'en' | 'ru'
+export type Lang = 'en' | 'ru' | 'zh' | 'es' | 'am'
 
 export interface ColorInfo {
   hex: string

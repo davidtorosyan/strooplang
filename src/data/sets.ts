@@ -11,4 +11,7 @@ export const colorSet: readonly Color[] = [
 export const langSet: readonly Lang[] = [
   'en',
   'ru',
+  'zh',
+  'es',
+  'am',
 ]
