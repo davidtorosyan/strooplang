@@ -28,11 +28,13 @@ function formatDate(date: Date): string {
       <tr>
         <th>Date</th>
         <th>Language</th>
+        <th>Baseline</th>
         <th>Interference</th>
       </tr>
       <tr v-for="result in examResults" :key="result.index">
         <td>{{ formatDate(result.date) }}</td>
         <td>{{ langRecords[result.lang].name }}</td>
+        <td v-if="result.stats">{{ result.stats.congruentMeanDurationMs }} ms</td>
         <td v-if="result.stats">{{ (result.stats.deltaPercent * 100).toFixed(0) }}%</td>
         <td v-else colspan="100%">Invalid responses!</td>
       </tr>
