@@ -27,5 +27,20 @@ export interface StimulusResponse {
 
 export interface TestResult {
   index: number
+  date: Date
   responses: StimulusResponse[]
+  lang: Lang
+}
+
+export interface TestStats {
+  responseCount: number
+  correctCount: number
+  congruentMeanDurationMs: number
+  incongruentMeanDurationMs: number
+  deltaMs: number
+  deltaPercent: number
+}
+
+export interface TestResultInfo extends TestResult {
+  stats: TestStats | undefined
 }

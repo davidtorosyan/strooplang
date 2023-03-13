@@ -34,7 +34,7 @@ function stopExam() {
   runningExam.value = false
 
   if (responses.value.length === examLength) {
-    examHistory.publish(responses.value)
+    examHistory.publish(responses.value, examSettings.lang)
   }
 
   stimuli.value = []
@@ -93,24 +93,6 @@ function respond(color: Color) {
       v-for="choice in colorSet" :key="choice">
       {{ choice }}
     </button>
-  </div>
-  <div class="guesses">
-    <table>
-      <tr>
-        <th>Visual Color</th>
-        <th>Written Color</th>
-        <th>Guess</th>
-        <th>Duration</th>
-        <th>Correct</th>
-        <th>Congruent</th>
-      </tr>
-      <tr v-for="guess in responses" :key="guess.index">
-        <td>{{ guess.stimulus }}</td>
-        <td>{{ guess.guess }}</td>
-        <td>{{ guess.durationMs }} milliseconds</td>
-        <td>{{ guess.correct }}</td>
-      </tr>
-    </table>
   </div>
 </template>
 
