@@ -17,7 +17,7 @@ export interface Stimulus {
   congruent: boolean
 }
 
-export interface Response {
+export interface StimulusResponse {
   index: number
   stimulus: Stimulus
   guess: Color
@@ -27,5 +27,5 @@ export interface Response {
 
 export interface TestResult {
   index: number
-  guesses: Response[]
+  responses: StimulusResponse[]
 }

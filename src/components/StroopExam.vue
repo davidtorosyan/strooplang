@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { ref, computed, type Ref } from 'vue'
-import type { Color, Response, Stimulus } from '@/data/types';
+import type { Color, StimulusResponse, Stimulus } from '@/data/types';
 import { colorRecords } from '@/data/colors';
 import { colorSet } from '@/data/sets';
 import { useExamSettingsStore } from '@/stores/examSettings'
+import { useExamHistoryStore } from '@/stores/examHistory'
 import { random, randomColor } from '@/utils/rand';
 import { Timer } from '@/utils/timer';
 
 const examSettings = useExamSettingsStore()
 const examLength = 5
 
+const examHistory = useExamHistoryStore()
+
 const runningExam = ref(false)
 const stimuli: Ref<Stimulus[]> = ref([])
-const responses: Ref<Response[]> = ref([])
+const responses: Ref<StimulusResponse[]> = ref([])
 const index = ref(0)
 
 const stimulus = computed(() => stimuli.value[index.value])
@@ -23,13 +26,20 @@ const timer = new Timer()
 
 function startExam() {
   stimuli.value = createStimuli()
-  index.value = 0
   runningExam.value = true
   timer.reset()
 }
 
 function stopExam() {
   runningExam.value = false
+
+  if (responses.value.length === examLength) {
+    examHistory.publish(responses.value)
+  }
+
+  stimuli.value = []
+  responses.value = []
+  index.value = 0
 }
 
 function createStimulus(): Stimulus {
