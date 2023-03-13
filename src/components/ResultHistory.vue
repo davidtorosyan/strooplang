@@ -13,6 +13,10 @@ const examResults: ComputedRef<TestResultInfo[]> = computed(() => examHistory.re
   stats: computeStats(r),
 })))
 
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })
+}
+
 </script>
 
 <template>
@@ -24,19 +28,13 @@ const examResults: ComputedRef<TestResultInfo[]> = computed(() => examHistory.re
       <tr>
         <th>Date</th>
         <th>Language</th>
-        <th>Matching Name</th>
-        <th>Different Name</th>
-        <th>Time increase</th>
         <th>Interference</th>
       </tr>
       <tr v-for="result in examResults" :key="result.index">
-        <td>{{ result.date }}</td>
+        <td>{{ formatDate(result.date) }}</td>
         <td>{{ langRecords[result.lang].name }}</td>
-        <td v-if="result.stats">{{ result.stats.congruentMeanDurationMs }} ms</td>
-        <td v-if="result.stats">{{ result.stats.incongruentMeanDurationMs }} ms</td>
-        <td v-if="result.stats">{{ result.stats.deltaMs }} ms</td>
         <td v-if="result.stats">{{ result.stats.deltaPercent * 100 }}%</td>
-        <td v-else colspan="100%">Not enough correct responses!</td>
+        <td v-else colspan="100%">Invalid responses!</td>
       </tr>
     </table>
     <span v-else>No results yet!</span>

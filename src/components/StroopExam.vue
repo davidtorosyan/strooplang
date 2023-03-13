@@ -109,7 +109,7 @@ function respond(color: Color) {
   border-style: solid;
   text-align: center;
   background-color: beige;
-  width: 600px;
+  width: 300px;
   height: 300px;
 }
 
