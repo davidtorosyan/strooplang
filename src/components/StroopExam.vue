@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, type Ref } from 'vue'
-import type { Color, GuessResult } from '@/data/types';
+import type { Color, Response, Stimulus } from '@/data/types';
 import { colorRecords } from '@/data/colors';
 import { colorSet } from '@/data/sets';
 import { useExamSettingsStore } from '@/stores/examSettings'
@@ -8,35 +8,59 @@ import { random, randomColor } from '@/utils/rand';
 import { Timer } from '@/utils/timer';
 
 const examSettings = useExamSettingsStore()
+const examLength = 5
 
-const visualColor: Ref<Color> = ref('red')
-const lexicalColor: Ref<Color> = ref('red')
+const runningExam = ref(false)
+const stimuli: Ref<Stimulus[]> = ref([])
+const responses: Ref<Response[]> = ref([])
+const index = ref(0)
 
-const hex = computed(() => colorRecords[visualColor.value].hex)
-const name = computed(() => colorRecords[lexicalColor.value].names[examSettings.lang])
-
-const guesses: Ref<GuessResult[]> = ref([])
+const stimulus = computed(() => stimuli.value[index.value])
+const hex = computed(() => runningExam.value ? colorRecords[stimulus.value.visual].hex : '')
+const name = computed(() => runningExam.value ? colorRecords[stimulus.value.lexical].names[examSettings.lang] : '')
 
 const timer = new Timer()
 
-function next() {
-  const congruent = random(0, 1) === 1
-  visualColor.value = randomColor()
-  lexicalColor.value = congruent ? visualColor.value : randomColor()
+function startExam() {
+  stimuli.value = createStimuli()
+  index.value = 0
+  runningExam.value = true
   timer.reset()
 }
 
-function guess(color: Color) {
-  guesses.value.push({
-    index: guesses.value.length,
-    visual: visualColor.value,
-    lexical: lexicalColor.value,
+function stopExam() {
+  runningExam.value = false
+}
+
+function createStimulus(): Stimulus {
+  const congruent = random(0, 1) === 1
+  const visual = randomColor()
+  const lexical = congruent ? visual : randomColor()
+  return {
+    visual,
+    lexical,
+    congruent,
+  }
+}
+
+function createStimuli(): Stimulus[] {
+  return Array.from({ length: examLength }, createStimulus);
+}
+
+function respond(color: Color) {
+  responses.value.push({
+    index: index.value,
+    stimulus: stimulus.value,
     guess: color,
     durationMs: timer.elapsedMs(),
-    correct: visualColor.value === color,
-    congruent: visualColor.value === lexicalColor.value,
+    correct: stimulus.value.visual === color,
   })
-  next()
+  index.value++
+  timer.reset()
+
+  if (index.value === stimuli.value.length) {
+    stopExam()
+  }
 }
 
 </script>
@@ -45,15 +69,18 @@ function guess(color: Color) {
   <h3>
     Exam
   </h3>
-  <div class="stage">
-    <span class="word">{{ name }}</span>
+  <div v-if="runningExam">
+    <button @click="stopExam">Stop</button>
   </div>
-  <div>
-    <button @click="next">next</button>
+  <div v-else>
+    <button @click="startExam">Start</button>
+  </div>
+  <div :class="['stage', { disabled: !runningExam }]">
+    <span v-if="runningExam" class="word">{{ name }}</span>
   </div>
   <div class="controls">
-    <button @click="guess(choice)" :style="`background-color: ${colorRecords[choice].hex};`" v-for="choice in colorSet"
-      :key="choice">
+    <button :disabled="!runningExam" @click="respond(choice)" :style="`background-color: ${colorRecords[choice].hex};`"
+      v-for="choice in colorSet" :key="choice">
       {{ choice }}
     </button>
   </div>
@@ -67,13 +94,11 @@ function guess(color: Color) {
         <th>Correct</th>
         <th>Congruent</th>
       </tr>
-      <tr v-for="guess in guesses" :key="guess.index">
-        <td>{{ guess.visual }}</td>
-        <td>{{ guess.lexical }}</td>
+      <tr v-for="guess in responses" :key="guess.index">
+        <td>{{ guess.stimulus }}</td>
         <td>{{ guess.guess }}</td>
         <td>{{ guess.durationMs }} milliseconds</td>
         <td>{{ guess.correct }}</td>
-        <td>{{ guess.congruent }}</td>
       </tr>
     </table>
   </div>
@@ -92,8 +117,17 @@ function guess(color: Color) {
   border-style: solid;
   text-align: center;
   background-color: beige;
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  width: 600px;
+  height: 300px;
+}
+
+.stage.disabled {
+  background-color: grey;
+  font-size: 0px;
+}
+
+.stage.disabled .word {
+  font-size: 0px;
 }
 
 .controls>button {

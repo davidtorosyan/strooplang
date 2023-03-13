@@ -11,12 +11,21 @@ export interface LangInfo {
   name: string
 }
 
-export interface GuessResult {
-  index: number
+export interface Stimulus {
   visual: Color
   lexical: Color
+  congruent: boolean
+}
+
+export interface Response {
+  index: number
+  stimulus: Stimulus
   guess: Color
   durationMs: number
   correct: boolean
-  congruent: boolean
+}
+
+export interface TestResult {
+  index: number
+  guesses: Response[]
 }
